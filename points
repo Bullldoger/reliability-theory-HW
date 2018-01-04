@@ -15,42 +15,57 @@ points2print([P1, P2, P3]) :-	print(P1),
 %% length([X|L], N) :- length(L, M), 
 %% 					N is M + 1.
 
-st([]).
-st([H|T]) :-	onePoint(H, T),
-				st(T).
+%% st([]).
+%% st([H|T]) :-	onePoint(H, T),
+%% 				st(T).
 
-onePoint(_, []).
-onePoint(_, [_]).
-onePoint(_, [_, _]).
-onePoint(P1, [H|T]) :-	onePoint(P1, T),
-						twoPoint(P1, H, T, L). 
-						%% print(L).
+%% onePoint(_, []).
+%% onePoint(_, [_]).
+%% onePoint(_, [_, _]).
+%% onePoint(_, [_, _, _]).
+%% onePoint(P1, [H|T]) :-	onePoint(P1, T),
+%% 						twoPoint(P1, H, T, L). 
+%% 						%% print(L).
 
-twoPoint(_, _, [], L) :-	L = [].
-twoPoint(P1, P2, [H|T], L) :-	twoPoint(P1, P2, T, L1),
-								threePoint(P1, P2, H, T, L1),
-								%% print(L1),
-								%% append(L1, [P1, P2, H], L),
-								%% print(L1).
-								length(L1, N),
-								%% print(L1),
-								%% print(N),
-								(
-								N > 0
-								->	
-								append(L1, [P1, P2, H], L);
-								append([], [], L)
-								).
-								%% print(OUT),
-								%% append(OUT, [P1, P2, H], RES),
-								%% print(RES).
+%% twoPoint(_, _, [], L).
+%% twoPoint(_, _, [_], L).
+%% twoPoint(_, _, [_, _], L).
+%% twoPoint(P1, P2, [H|T], L) :-	twoPoint(P1, P2, T, L1),
+%% 								threePoint(P1, P2, H, T, L1).
+%% 								%% print(L1),
+%% 								%% append(L1, [P1, P2, H], L),
+%% 								%% print(L1).
+%% 								%% length(L1, N),
+%% 								%% print(L1),
+%% 								%% print(N),
+								
+%% 								%% (
+%% 								%% N > 0
+%% 								%% ->	
+%% 								%% append(L1, [H, P2, P1], L),
+%% 								%% print(L);
+%% 								%% L = L
+%% 								%% ).
+								
+%% 								%% append(OUT, [P1, P2, H], RES),
+%% 								%% print(RES).
 
-threePoint(P1, P2, P3, [], L) :-	L = [].
-threePoint(P1, P2, P3, [H|T], L) :-	threePoint(P1, P2, P3, T, L1),
-									diff([P1, P2, P3], H, D),
-									print(D),
-									(D = 0
-									->
-									append(L1, [H], L);
-									append(L1, [], L)
-									).
+%% threePoint(P1, P2, P3, [], L).
+%% threePoint(P1, P2, P3, [H|T], L) :-	threePoint(P1, P2, P3, T, L1),
+%% 									diff([P1, P2, P3], H, D),
+%% 									%% print(D),
+%% 									(D = 0
+%% 									->
+%% 									append(L1, [H], L);
+%% 									L = L1
+%% 									),
+%% 									print(L).
+
+gen([], L, _) :-	!.
+gen(_, [P1, P2, P3], O) :-	!.
+
+gen([H|T], L, O) :-	append(L, [H], L1),
+					%% print(L),
+					print(L1),
+					gen(T, L, O),
+					gen(T, L1, O).
