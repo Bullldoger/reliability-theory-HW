@@ -7,9 +7,9 @@ det([[A11, A12, A13], [A21, A22, A23], [A31, A32, A33]], D) :-	D is A11 * A22 * 
 
 diff([[A11, A12, A13], [A21, A22, A23], [A31, A32, A33]], [X1, X2, X3], D) :-	det([[A11 - X1, A12 - X2, A13 - X3], [A21 - X1, A22 - X2, A23 - X3], [A31 - X1, A32 - X2, A33 - X3]], D).
 
-points2print([P1, P2, P3]) :-	print(P1),
-								print(P2),
-								print(P3).
+%% points2print([P1, P2, P3]) :-	print(P1),
+%% 								print(P2),
+%% 								print(P3).
 
 %% length([], 0). 
 %% length([X|L], N) :- length(L, M), 
@@ -61,11 +61,39 @@ points2print([P1, P2, P3]) :-	print(P1),
 %% 									),
 %% 									print(L).
 
-gen([], L, _) :-	!.
-gen(_, [P1, P2, P3], O) :-	!.
+createList(_, [], []) :-	!.
+createList(BASEPOINT, [H|T], OUTLIST) :-	createList(BASEPOINT, T, OUTLIST1),
+											%% print(OUTLIST1),
+											diff(BASEPOINT, H, D),
+											%% print(D),
+											(D = 0
+											->
+											append(OUTLIST1, [H], OUTLIST);
+											append([], OUTLIST1, OUTLIST)
+											).
 
-gen([H|T], L, O) :-	append(L, [H], L1),
-					%% print(L),
-					print(L1),
-					gen(T, L, O),
-					gen(T, L1, O).
+gen([], [], _, _) :-	!.
+gen([], [P1], [], _) :-	!.
+gen([], [P1, P2], [], _) :-	!.
+gen(_, [P1, P2, P3], O, POINTS) :-	append([], [[P1, P2, P3]], O),	
+									createList([P1, P2, P3], POINTS, POINTS_LIST),
+									%% print(POINTS_LIST),
+									%% append([], [POINTS_LIST], OUT),
+									length(POINTS_LIST, N),
+									(N > 3
+									->
+									append([], [POINTS_LIST], OUT);
+									append([], [], OUT)
+									),
+									print(OUT), 
+									!.
+
+gen([H|T], L, O, POINTS) :-	append(L, [H], L1),
+							%% print(L),
+							%% print(L1),
+							gen(T, L, O1, POINTS),
+							gen(T, L1, O2, POINTS),
+							%% append(L1, L2, LIST),
+							append(O1, O2, O).
+
+start(POINTS, LIST) :-	gen(POINTS, [], O, POINTS), !.
