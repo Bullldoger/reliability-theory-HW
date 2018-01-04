@@ -7,60 +7,6 @@ det([[A11, A12, A13], [A21, A22, A23], [A31, A32, A33]], D) :-	D is A11 * A22 * 
 
 diff([[A11, A12, A13], [A21, A22, A23], [A31, A32, A33]], [X1, X2, X3], D) :-	det([[A11 - X1, A12 - X2, A13 - X3], [A21 - X1, A22 - X2, A23 - X3], [A31 - X1, A32 - X2, A33 - X3]], D).
 
-%% points2print([P1, P2, P3]) :-	print(P1),
-%% 								print(P2),
-%% 								print(P3).
-
-%% length([], 0). 
-%% length([X|L], N) :- length(L, M), 
-%% 					N is M + 1.
-
-%% st([]).
-%% st([H|T]) :-	onePoint(H, T),
-%% 				st(T).
-
-%% onePoint(_, []).
-%% onePoint(_, [_]).
-%% onePoint(_, [_, _]).
-%% onePoint(_, [_, _, _]).
-%% onePoint(P1, [H|T]) :-	onePoint(P1, T),
-%% 						twoPoint(P1, H, T, L). 
-%% 						%% print(L).
-
-%% twoPoint(_, _, [], L).
-%% twoPoint(_, _, [_], L).
-%% twoPoint(_, _, [_, _], L).
-%% twoPoint(P1, P2, [H|T], L) :-	twoPoint(P1, P2, T, L1),
-%% 								threePoint(P1, P2, H, T, L1).
-%% 								%% print(L1),
-%% 								%% append(L1, [P1, P2, H], L),
-%% 								%% print(L1).
-%% 								%% length(L1, N),
-%% 								%% print(L1),
-%% 								%% print(N),
-								
-%% 								%% (
-%% 								%% N > 0
-%% 								%% ->	
-%% 								%% append(L1, [H, P2, P1], L),
-%% 								%% print(L);
-%% 								%% L = L
-%% 								%% ).
-								
-%% 								%% append(OUT, [P1, P2, H], RES),
-%% 								%% print(RES).
-
-%% threePoint(P1, P2, P3, [], L).
-%% threePoint(P1, P2, P3, [H|T], L) :-	threePoint(P1, P2, P3, T, L1),
-%% 									diff([P1, P2, P3], H, D),
-%% 									%% print(D),
-%% 									(D = 0
-%% 									->
-%% 									append(L1, [H], L);
-%% 									L = L1
-%% 									),
-%% 									print(L).
-
 createList(_, [], []) :-	!.
 createList(BASEPOINT, [H|T], OUTLIST) :-	createList(BASEPOINT, T, OUTLIST1),
 											%% print(OUTLIST1),
@@ -72,28 +18,26 @@ createList(BASEPOINT, [H|T], OUTLIST) :-	createList(BASEPOINT, T, OUTLIST1),
 											append([], OUTLIST1, OUTLIST)
 											).
 
-gen([], [], _, _) :-	!.
-gen([], [P1], [], _) :-	!.
-gen([], [P1, P2], [], _) :-	!.
-gen(_, [P1, P2, P3], O, POINTS) :-	append([], [[P1, P2, P3]], O),	
-									createList([P1, P2, P3], POINTS, POINTS_LIST),
-									%% print(POINTS_LIST),
-									%% append([], [POINTS_LIST], OUT),
-									length(POINTS_LIST, N),
-									(N > 3
-									->
-									append([], [POINTS_LIST], OUT);
-									append([], [], OUT)
-									),
-									print(OUT), 
-									!.
+gen([], [], _, _, _) :-	!.
+gen([], [P1], [], _, _) :-	!.
+gen([], [P1, P2], [], _, _) :-	!.
+gen(_, [P1, P2, P3], O, POINTS, OUT) :-	append([], [[P1, P2, P3]], O),	
+										createList([P1, P2, P3], POINTS, POINTS_LIST),
+										%% print(POINTS_LIST),
+										%% append([], [POINTS_LIST], OUT),
+										length(POINTS_LIST, N),
+										(N > 3
+										->
+										append([], [POINTS_LIST], OUT);
+										append([], [], OUT)
+										).
 
-gen([H|T], L, O, POINTS) :-	append(L, [H], L1),
-							%% print(L),
-							%% print(L1),
-							gen(T, L, O1, POINTS),
-							gen(T, L1, O2, POINTS),
-							%% append(L1, L2, LIST),
-							append(O1, O2, O).
+gen([H|T], L, O, POINTS, OUT) :-	append(L, [H], L1),
+									%% print(L),
+									%% print(L1),
+									gen(T, L, O1, POINTS, LP1),
+									gen(T, L1, O2, POINTS, LP2),
+									append(LP1, LP2, OUT),
+									append(O1, O2, O).
 
-start(POINTS, LIST) :-	gen(POINTS, [], O, POINTS), !.
+start(POINTS, LIST) :-	gen(POINTS, [], O, POINTS, LIST), !.
