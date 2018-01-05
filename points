@@ -18,26 +18,51 @@ createList(BASEPOINT, [H|T], OUTLIST) :-	createList(BASEPOINT, T, OUTLIST1),
 											append([], OUTLIST1, OUTLIST)
 											).
 
-gen([], [], _, _, _) :-	!.
-gen([], [P1], [], _, _) :-	!.
-gen([], [P1, P2], [], _, _) :-	!.
-gen(_, [P1, P2, P3], O, POINTS, OUT) :-	append([], [[P1, P2, P3]], O),	
-										createList([P1, P2, P3], POINTS, POINTS_LIST),
-										%% print(POINTS_LIST),
-										%% append([], [POINTS_LIST], OUT),
-										length(POINTS_LIST, N),
-										(N > 3
-										->
-										append([], [POINTS_LIST], OUT);
-										append([], [], OUT)
-										).
+deleteElementsAtPositions(L, _, [], L).
+deleteElementsAtPositions([], CURRENTPOS, _, []).
+deleteElementsAtPositions([H|T], CURRENTPOS, [POS|POSITIONS], NEWLIST) :-	NEXTPOSITION is CURRENTPOS + 1,
+																			%% print(NEWLIST),
+																			%% print([POS|POSITIONS]),
+																			%% print([H|T]),
+																			%% print(POS),
+																			%% print(NEXTPOSITION),
+																			(CURRENTPOS = POS
+																			->
+																			%% append(NEWLIST, [], NEWLIST1),
+																			%% print(NEWLIST1),
+																			deleteElementsAtPositions(T, NEXTPOSITION, POSITIONS, NEWLIST1),
+																			append(NEWLIST1, [], NEWLIST)
+																			;
+																			deleteElementsAtPositions(T, NEXTPOSITION, [POS|POSITIONS], NEWLIST1),
+																			append(NEWLIST1, [H], NEWLIST)
+																			),
+																			!.
 
-gen([H|T], L, O, POINTS, OUT) :-	append(L, [H], L1),
-									%% print(L),
-									%% print(L1),
-									gen(T, L, O1, POINTS, LP1),
-									gen(T, L1, O2, POINTS, LP2),
-									append(LP1, LP2, OUT),
-									append(O1, O2, O).
+gen([], [], _, _, _, _, _) :-	!.
+gen([], [P1], [], _, _, _, _) :-	!.
+gen([], [P1, P2], [], _, _, _, _) :-	!.
+gen(_, [P1, P2, P3], O, POINTS, OUT, POS, POSITIONS) :-	append([], [[P1, P2, P3]], O),	
+														deleteElementsAtPositions(POINTS, 1, POSITIONS, CLEANELEMS),
+														%% print(CLEANELEMS),
+														createList([P1, P2, P3], CLEANELEMS, POINTS_LIST),
+														%% print(POSITIONS), 
+														print(POINTS_LIST),
+														%% append([], [POINTS_LIST], OUT),
+														length(POINTS_LIST, N),
+														(N > 0
+														->
+														append([], POINTS_LIST, OUT);
+														append([], [], OUT)
+														).
 
-start(POINTS, LIST) :-	gen(POINTS, [], O, POINTS, LIST), !.
+gen([H|T], L, O, POINTS, OUT, POS, POSITIONS) :-	append(L, [H], L1),
+													append(POSITIONS, [POS], NEWPOSITIONS),
+													%% print(L),
+													%% print(L1),
+													POSNEXT is POS + 1,
+													gen(T, L, O1, POINTS, LP1, POSNEXT, POSITIONS),
+													gen(T, L1, O2, POINTS, LP2, POSNEXT, NEWPOSITIONS),
+													append(LP1, LP2, OUT),
+													append(O1, O2, O).
+
+start(POINTS, LIST) :-	gen(POINTS, [], O, POINTS, LIST, 1, []), !.
