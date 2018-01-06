@@ -55,7 +55,7 @@ gen(_, [P1, P2, P3], O, POINTS, OUT, POS, POSITIONS) :-	append([], [[P1, P2, P3]
 														append([], [], OUT)
 														).
 
-gen([H|T], L, O, POINTS, OUT, POS) :-	append(L, [H], L1),
+gen([H|T], L, O, POINTS, OUT, POS, POSITIONS) :-	append(L, [H], L1),
 													append(POSITIONS, [POS], NEWPOSITIONS),
 													%% print(L),
 													%% print(L1),
