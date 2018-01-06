@@ -51,7 +51,7 @@ gen(_, [P1, P2, P3], O, POINTS, OUT, POS, POSITIONS) :-	append([], [[P1, P2, P3]
 														%% print(CLEANELEMS),
 														createList([P1, P2, P3], CLEANELEMS, POINTS_LIST),
 														%% print(POSITIONS), 
-														print(POINTS_LIST),
+														%% print(POINTS_LIST),
 														%% append([], [POINTS_LIST], OUT),
 														length(POINTS_LIST, N),
 														(N > 0
