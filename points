@@ -1,3 +1,4 @@
+%% Подсчет определителя матрицы 3 на 3(в тупую)
 det([[A11, A12, A13], [A21, A22, A23], [A31, A32, A33]], D) :-	D is A11 * A22 * A33 
 																	- A11 * A32 * A23
 																	- A12 * A21 * A33
@@ -5,8 +6,10 @@ det([[A11, A12, A13], [A21, A22, A23], [A31, A32, A33]], D) :-	D is A11 * A22 * 
 																	+ A13 * A21 * A32
 																	- A13 * A22 * A31.
 
+%% Как на сайте http://www.academiaxxi.ru/WWW_Books/HM/Ag/01/09/e.htm - из 4-х точек формируется 3 вектора и считается определитель полученной матрицы, если 0 - то лежат
 diff([[A11, A12, A13], [A21, A22, A23], [A31, A32, A33]], [X1, X2, X3], D) :-	det([[A11 - X1, A12 - X2, A13 - X3], [A21 - X1, A22 - X2, A23 - X3], [A31 - X1, A32 - X2, A33 - X3]], D).
 
+%% Создается список точек лежащих в одной плоскости на основе произвольных 3-х и поочередно добавляются те точки, которые не учавствуют в построении точки
 createList(_, [], []) :-	!.
 createList(BASEPOINT, [H|T], OUTLIST) :-	createList(BASEPOINT, T, OUTLIST1),
 											%% print(OUTLIST1),
@@ -18,6 +21,7 @@ createList(BASEPOINT, [H|T], OUTLIST) :-	createList(BASEPOINT, T, OUTLIST1),
 											append([], OUTLIST1, OUTLIST)
 											).
 
+%% Из списка точек удаляются те, по которым строится плоскость и остаются только те, которые проверяются на принадлежность плоскости
 deleteElementsAtPositions(L, _, [], L).
 deleteElementsAtPositions([], CURRENTPOS, _, []).
 deleteElementsAtPositions([H|T], CURRENTPOS, [POS|POSITIONS], NEWLIST) :-	NEXTPOSITION is CURRENTPOS + 1,
@@ -38,6 +42,7 @@ deleteElementsAtPositions([H|T], CURRENTPOS, [POS|POSITIONS], NEWLIST) :-	NEXTPO
 																			),
 																			!.
 
+%% Генерация всех сочетаний из 3-х точек и построение плоскостей
 gen([], [], _, _, _, _, _) :-	!.
 gen([], [P1], [], _, _, _, _) :-	!.
 gen([], [P1, P2], [], _, _, _, _) :-	!.
@@ -64,5 +69,5 @@ gen([H|T], L, O, POINTS, OUT, POS, POSITIONS) :-	append(L, [H], L1),
 													gen(T, L1, O2, POINTS, LP2, POSNEXT, NEWPOSITIONS),
 													append(LP1, LP2, OUT),
 													append(O1, O2, O).
-
+%% Стартовый предикат, который получает список точек(POINTS) и LIST - результат - все множества точек из одной плоскости
 start(POINTS, LIST) :-	gen(POINTS, [], O, POINTS, LIST, 1, []), !.
