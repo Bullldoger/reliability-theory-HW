@@ -58,10 +58,11 @@ gen(_, [P1, P2, P3], O, POINTS, OUT, POS, POSITIONS) :-	append([], [[P1, P2, P3]
 														%% print(POSITIONS), 
 														%% print(POINTS_LIST),
 														%% append([], [POINTS_LIST], OUT),
-														length(POINTS_LIST, N),
-														(N > 0
+														append(POINTS_LIST, [P1, P2, P3], RESPOINTS),
+														length(RESPOINTS, N),
+														(N > 3
 														->
-														append([], POINTS_LIST, OUT);
+														append([], [RESPOINTS], OUT);
 														append([], [], OUT)
 														).
 
