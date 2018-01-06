@@ -10,6 +10,7 @@ scalar_multiplication(K, [H|T], [H1|T1]) :-
 
 %Если входной список пуст, то отсечение
 vector_multiplication([], _, []) :- !.
+vector_multiplication([], [], _) :- !.
 %Элемент H умножается на вектор строку Y и дописывается в новый список, далее рекурсивно вниз
 vector_multiplication([H|T], Y, [ANS_H|ANS_T]) :- 
 											scalar_multiplication(H, Y, ANS_H), 
