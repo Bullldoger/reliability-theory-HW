@@ -42,6 +42,11 @@ deleteElementsAtPositions([H|T], CURRENTPOS, [POS|POSITIONS], NEWLIST) :-	NEXTPO
 																			),
 																			!.
 
+%% Вывод списка
+printList([]).
+printList([H|T]) :-	print(H),
+					printList(T).
+
 %% Генерация всех сочетаний из 3-х точек и построение плоскостей
 gen([], [], _, _, _, _, _) :-	!.
 gen([], [P1], [], _, _, _, _) :-	!.
