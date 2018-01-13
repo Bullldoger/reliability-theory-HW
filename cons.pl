@@ -17,7 +17,8 @@ checkMatrix([H|T]) :- checkMatrix(T),
 
 transposition(Matrix, TransposeMatrix):-
   checkMatrix(Matrix),
-  transposition(0, Matrix, TransposeMatrix).
+  transposition(0, Matrix, TransposeMatrix), !;
+  print('Неправильный ввод').
  
 transposition(Iterator, Matrix, [Column|TransposeTail]):-
   TailIterator #= Iterator + 1,
