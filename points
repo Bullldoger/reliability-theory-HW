@@ -10,11 +10,15 @@ det([[A11, A12, A13], [A21, A22, A23], [A31, A32, A33]], D) :-	D is A11 * A22 * 
 diff([[A11, A12, A13], [A21, A22, A23], [A31, A32, A33]], [X1, X2, X3], D) :-	det([[A11 - X1, A12 - X2, A13 - X3], [A21 - X1, A22 - X2, A23 - X3], [A31 - X1, A32 - X2, A33 - X3]], D).
 
 %% Создается список точек лежащих в одной плоскости на основе произвольных 3-х и поочередно добавляются те точки, которые не учавствуют в построении точки
+%% 
 createList(_, [], []) :-	!.
-createList(BASEPOINT, [H|T], OUTLIST) :-	createList(BASEPOINT, T, OUTLIST1),
-											%% print(OUTLIST1),
+%% 
+createList(BASEPOINT, [H|T], OUTLIST) :-	
+											%% рекурсивно вниз
+											createList(BASEPOINT, T, OUTLIST1),
+											%% вычисление определителя, для выяснения лежат ли точки в одном плоскости
 											diff(BASEPOINT, H, D),
-											%% print(D),
+											%% если определитель равен 0, то точки лежат в одной плоскости, иначе нет
 											(D = 0
 											->
 											append(OUTLIST1, [H], OUTLIST);
@@ -22,18 +26,17 @@ createList(BASEPOINT, [H|T], OUTLIST) :-	createList(BASEPOINT, T, OUTLIST1),
 											).
 
 %% Из списка точек удаляются те, по которым строится плоскость и остаются только те, которые проверяются на принадлежность плоскости
+%% Остановка, если список "позиций" точек подлежащих удалению, пуст
 deleteElementsAtPositions(L, _, [], L).
+%% Если список точек пуст, то остановка
 deleteElementsAtPositions([], CURRENTPOS, _, []).
-deleteElementsAtPositions([H|T], CURRENTPOS, [POS|POSITIONS], NEWLIST) :-	NEXTPOSITION is CURRENTPOS + 1,
-																			%% print(NEWLIST),
-																			%% print([POS|POSITIONS]),
-																			%% print([H|T]),
-																			%% print(POS),
-																			%% print(NEXTPOSITION),
+%% если позиция точки входит в список позиций для удаления, то данная точка не входит в список
+deleteElementsAtPositions([H|T], CURRENTPOS, [POS|POSITIONS], NEWLIST) :-	
+																			%% вычисляется следующий индекс
+																			NEXTPOSITION is CURRENTPOS + 1,
+																			%% проверка, входит ли данная позиция в список заданных для удаления
 																			(CURRENTPOS = POS
 																			->
-																			%% append(NEWLIST, [], NEWLIST1),
-																			%% print(NEWLIST1),
 																			deleteElementsAtPositions(T, NEXTPOSITION, POSITIONS, NEWLIST1),
 																			append(NEWLIST1, [], NEWLIST)
 																			;
@@ -43,23 +46,34 @@ deleteElementsAtPositions([H|T], CURRENTPOS, [POS|POSITIONS], NEWLIST) :-	NEXTPO
 																			!.
 
 %% Вывод списка
+%% Критерий остановки вывод - пустой список
 printList([]).
-printList([H|T]) :-	print(H),
+printList([H|T]) :-	
+					%% вывод элемента списка
+					print(H),
+					%% перенос строки
 					nl,
+					%% далее рекурсивно вниз
 					printList(T).
 
 %% Генерация всех сочетаний из 3-х точек и построение плоскостей
+%% Остановка, если список точек пуст и список базисных точек также пуст
 gen([], [], _, _, _, _, _) :-	!.
+%% Список точек пуст и в списке базисных точек только одна
 gen([], [P1], [], _, _, _, _) :-	!.
+%%  Список точек пуст и в списке базисных точек 2
 gen([], [P1, P2], [], _, _, _, _) :-	!.
-gen(_, [P1, P2, P3], O, POINTS, OUT, POS, POSITIONS) :-	append([], [[P1, P2, P3]], O),	
+%% Если базисных точек 3, строится плоскость и по точкам, не входящим в список базисных начинается обход для проверки какие из них лежат плоскости, образованной базисными точками
+gen(_, [P1, P2, P3], O, POINTS, OUT, POS, POSITIONS) :-	
+														%% Добавление 3-ки базисных точек в список О
+														append([], [[P1, P2, P3]], O),	
+														%% Из списка всех точек удаляются те, по которым строится плоскость
 														deleteElementsAtPositions(POINTS, 1, POSITIONS, CLEANELEMS),
-														%% print(CLEANELEMS),
+														%% формируется список точек лежащих в плоскости построенной по базисным точкам
 														createList([P1, P2, P3], CLEANELEMS, POINTS_LIST),
-														%% print(POSITIONS), 
-														%% print(POINTS_LIST),
-														%% append([], [POINTS_LIST], OUT),
+														%% добавление базисных точек в список тех, которые лежат в одной плоскости с ними
 														append(POINTS_LIST, [P1, P2, P3], RESPOINTS),
+														%% вычисление количества точек лежащих в заданной плоскости и если их 4 и более, то этот список нам подходит
 														length(RESPOINTS, N),
 														(N > 3
 														->
@@ -67,14 +81,20 @@ gen(_, [P1, P2, P3], O, POINTS, OUT, POS, POSITIONS) :-	append([], [[P1, P2, P3]
 														append([], [], OUT)
 														).
 
-gen([H|T], L, O, POINTS, OUT, POS, POSITIONS) :-	append(L, [H], L1),
+gen([H|T], L, O, POINTS, OUT, POS, POSITIONS) :-	
+													%% добавление H в список базисных точек
+													append(L, [H], L1),
+													%% добавление позиции точки H в список индексов точек, вошедших в базис
 													append(POSITIONS, [POS], NEWPOSITIONS),
-													%% print(L),
-													%% print(L1),
+													%% вычисляется следующий индекс(позиция)
 													POSNEXT is POS + 1,
+													%% рекурсивно вниз с пустым список базисных точек и оставшейся части списка точек
 													gen(T, L, O1, POINTS, LP1, POSNEXT, POSITIONS),
+													%% рекурсивно вниз с частичным базисом точек и оставшейся части списка точек
 													gen(T, L1, O2, POINTS, LP2, POSNEXT, NEWPOSITIONS),
+													%% соединение списков точек лежащих в одной плоскости
 													append(LP1, LP2, OUT),
+													%% 
 													append(O1, O2, O).
 %% Стартовый предикат, который получает список точек(POINTS) и LIST - результат - все множества точек из одной плоскости
 start(POINTS, LIST) :-	gen(POINTS, [], O, POINTS, LIST, 1, []), !.
